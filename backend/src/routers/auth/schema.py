@@ -31,6 +31,7 @@ class User(SQLModel, table=True):
     level_up_xp: int = Field(sa_column=Column(pg.INTEGER, default=1000))
     current_level: int = Field(sa_column=Column(pg.INTEGER, default=1))
     is_verified: bool = Field(default=False)
+    online_status:bool = Field(default=False)
     role:str = Field(sa_column=Column(pg.VARCHAR,default='user'))
     niche_invitation_link:str = Field(sa_column=Column(pg.VARCHAR,nullable=True))
     date_joined: float = Field(default_factory=lambda: datetime.now().timestamp())

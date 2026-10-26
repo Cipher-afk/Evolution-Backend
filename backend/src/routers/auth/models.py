@@ -28,4 +28,4 @@ class UpdateUserModel(BaseModel):
 class UserDataDict(TypedDict):
     user_id: str
     email: str
-    username: str
+    username: str 

@@ -44,3 +44,23 @@ async def get_invitation_link_for_niche(token_data:Dict = Depends(AccessTokenBea
     user_id = token_data['user']['user_id']
     niche_invitation_link = await goal_service.get_niche_link(user_id=user_id,session=session)
     return niche_invitation_link
+
+@router.get('/potential_friends')
+async def get_potential_friends():
+    pass
+
+@router.get('/all_friends')
+async def get_all_friends():
+    pass
+
+@router.get('/friends_with_same_niche')
+async def get_friends_with_same_niche():
+    pass
+
+@router.post('/send_friend_request')
+async def send_friend_request():
+    pass
+
+@router.get('/set_request_status')
+async def set_request_status():
+    pass
