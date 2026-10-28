@@ -15,7 +15,6 @@ import asyncio
 from uuid import UUID
 
 
-
 class UserService:
     async def create_user(self, signup_info: SignUpModel, session: AsyncSession):
         signup_data = signup_info.model_dump()
@@ -49,6 +48,12 @@ class UserService:
 
     async def get_user_by_user_id(self, user_id, session: AsyncSession):
         statement = select(User).where(User.user_id == user_id)
+        result = await session.execute(statement)
+        user = result.scalars().first()
+        return user
+
+    async def get_user_by_username(self, username: str, session: AsyncSession):
+        statement = select(User).where(User.username == username)
         result = await session.execute(statement)
         user = result.scalars().first()
         return user
@@ -88,14 +93,8 @@ class UserService:
             return {"leveled_up": True}
         return {"leveled_up": False}
 
-    async def get_all_users(self,session:AsyncSession):
+    async def get_all_users(self, session: AsyncSession):
         statement = select(User).order_by(asc(User.lifetime_xp))
         results = await session.execute(statement=statement)
         users = results.scalars().all()
         return users
-
-
-
-    
-
-

@@ -1,5 +1,5 @@
 from fastapi.security import HTTPBearer
-from fastapi import HTTPException,status,Depends
+from fastapi import HTTPException,status,Depends,WebSocket,WebSocketException
 from utils import decode_token
 import asyncio
 from typing import Dict, List
@@ -15,6 +15,25 @@ from dataclasses import dataclass
 auth_service = UserService()
 
 
+class WebSocketTokenBearer():
+    async def __call__(self, websocket:WebSocket):
+        auth = websocket.headers.get('authorization','')
+        scheme,_,token = auth.partition(' ')
+        if scheme.lower() == 'bearer':
+            token_data = await asyncio.to_thread(decode_token, token=token)
+            if token_data is None:
+                raise WebSocketException(code=status.WS_1003_UNSUPPORTED_DATA,reason='Invalid Token')
+            await self.verify_token(token_data=token_data)
+            jti = token_data["jti"]
+            try:
+                if await is_in_blacklist(jti=jti):
+                    raise WebSocketException(code=status.WS_1003_UNSUPPORTED_DATA,reason='Invalid Token')
+            except ConnectionError as e:
+                raise WebSocketException(code=status.WS_1013_TRY_AGAIN_LATER,reason='Internet Connection is bad try again later')
+            return token_data
+        raise WebSocketException(code=status.WS_1003_UNSUPPORTED_DATA,reason='No bearer token')
+    
+            
 class TokenBearer(HTTPBearer):
     def __init__(
         self, *, bearerFormat=None, scheme_name=None, description=None, auto_error=True
